@@ -9,16 +9,18 @@ import {
   ReactFlow,
   ReactFlowProvider,
   getSmoothStepPath,
+  useEdgesState,
+  useNodesState,
   type Edge,
   type EdgeProps,
   type Node,
   type NodeMouseHandler,
   type NodeProps,
 } from "@xyflow/react";
-import { type CSSProperties, useMemo } from "react";
+import { type CSSProperties, useEffect, useMemo } from "react";
 import { kernelEdges } from "../data/edges";
 import { kernelNodes } from "../data/nodes";
-import type { Layer } from "../types";
+import type { EdgeType, Layer } from "../types";
 import { edgeTypeLabels, layerColors, layerNames, nodeById } from "../utils/model";
 
 type LinuxMapProps = {
@@ -166,126 +168,182 @@ const layerAreaSize = (layer: Layer, nodeCount: number) => {
   };
 };
 
+// Позиции узлов детерминированы и НЕ меняются во время работы. Считаем их один раз
+// и переиспользуем те же ссылки — иначе react-flow на каждом шаге сценария думает,
+// что узлы «переехали», сбрасывает измерения и рёбра теряют координаты (исчезают).
+const MODEL_NODE_POSITIONS: Record<string, { x: number; y: number }> = (() => {
+  const counters: Record<Layer, number> = { hardware: 0, kernel: 0, userspace: 0, observability: 0 };
+  const positions: Record<string, { x: number; y: number }> = {};
+  for (const kernelNode of kernelNodes) {
+    const indexInLayer = counters[kernelNode.layer];
+    counters[kernelNode.layer] += 1;
+    positions[kernelNode.id] = makePosition(kernelNode.layer, indexInLayer);
+  }
+  return positions;
+})();
+
+// Узлы-подложки слоёв полностью статичны — создаём один раз.
+const LAYER_AREA_NODES: Node[] = (() => {
+  const totals: Record<Layer, number> = { hardware: 0, kernel: 0, userspace: 0, observability: 0 };
+  for (const kernelNode of kernelNodes) {
+    totals[kernelNode.layer] += 1;
+  }
+  return layerOrder.map((layer) => {
+    const size = layerAreaSize(layer, totals[layer]);
+    return {
+      id: `layer-area-${layer}`,
+      position: { x: -layerPaddingX, y: layerBaseY[layer] - layerPaddingTop },
+      data: {
+        label: (
+          <div className="layerAreaLabel">
+            <strong>{layerNames[layer]}</strong>
+            <span>{totals[layer]} узлов</span>
+          </div>
+        ),
+      },
+      className: ["layerArea", `layerArea-${layer}`].join(" "),
+      selectable: false,
+      draggable: false,
+      connectable: false,
+      focusable: false,
+      zIndex: -100,
+      style: { width: size.width, height: size.height, borderColor: layerColors[layer] },
+    };
+  });
+})();
+
+const nodeStateFor = (
+  id: string,
+  selectedNodeId: string,
+  activeNodes: Set<string>,
+  pathNodes: Set<string>,
+): NodeState => {
+  if (id === selectedNodeId) return "selected";
+  if (pathNodes.has(id)) return "path";
+  if (activeNodes.has(id)) return "active";
+  return "idle";
+};
+
+const makeModelNode = (kernelNodeId: string, state: NodeState): Node => {
+  const kernelNode = nodeById.get(kernelNodeId)!;
+  return {
+    id: kernelNode.id,
+    type: "model",
+    position: MODEL_NODE_POSITIONS[kernelNode.id],
+    width: nodeWidth,
+    height: nodeHeight,
+    data: {
+      title: kernelNode.title,
+      category: kernelNode.category,
+      layer: kernelNode.layer,
+      color: layerColors[kernelNode.layer],
+      state,
+    } satisfies ModelNodeData,
+    zIndex: state === "idle" ? 1 : 6,
+  };
+};
+
+// Тип связи по id ребра — нужен, чтобы восстановить подпись при обновлении.
+const EDGE_TYPE_BY_ID = new Map<string, EdgeType>(kernelEdges.map((edge) => [edge.id, edge.type]));
+
+const edgeVisual = (isActive: boolean) => ({
+  animated: isActive,
+  zIndex: isActive ? 4 : 0,
+  markerEnd: { type: MarkerType.ArrowClosed, color: isActive ? "#facc15" : "#64748b" },
+  style: {
+    opacity: isActive ? 1 : 0.34,
+    stroke: isActive ? "#facc15" : "rgba(100, 116, 139, 0.48)",
+    strokeWidth: isActive ? 3 : 0.9,
+  },
+});
+
+const edgeData = (edgeId: string, isActive: boolean): PacketEdgeData => {
+  const type = EDGE_TYPE_BY_ID.get(edgeId);
+  return {
+    label: isActive && type ? edgeTypeLabels[type] : undefined,
+    animated: isActive,
+    color: isActive ? "#facc15" : "#64748b",
+  };
+};
+
+const makeEdge = (kernelEdgeId: string, isActive: boolean): Edge => {
+  const kernelEdge = kernelEdges.find((edge) => edge.id === kernelEdgeId)!;
+  return {
+    id: kernelEdge.id,
+    source: kernelEdge.source,
+    target: kernelEdge.target,
+    type: "packet",
+    ...edgeVisual(isActive),
+    data: edgeData(kernelEdge.id, isActive),
+  };
+};
+
 export function LinuxMap({ selectedNodeId, activeNodeIds, activeEdgeIds, pathNodeIds, onSelectNode }: LinuxMapProps) {
   const activeNodes = useMemo(() => new Set(activeNodeIds), [activeNodeIds]);
   const activeEdges = useMemo(() => new Set(activeEdgeIds), [activeEdgeIds]);
   const pathNodes = useMemo(() => new Set(pathNodeIds), [pathNodeIds]);
 
-  const nodes: Node[] = useMemo(() => {
-    const layerTotals = layerOrder.reduce<Record<Layer, number>>(
-      (totals, layer) => ({
-        ...totals,
-        [layer]: kernelNodes.filter((kernelNode) => kernelNode.layer === layer).length,
-      }),
-      {
-        hardware: 0,
-        kernel: 0,
-        userspace: 0,
-        observability: 0,
-      },
+  // Строим начальные узлы/рёбра ОДИН раз. Дальше меняем только их поля через
+  // setNodes/setEdges — так react-flow сохраняет измеренную геометрию, и рёбра
+  // не пропадают при обновлениях во время сценария.
+  const initialNodes = useMemo(() => {
+    const modelNodes = kernelNodes.map((kernelNode) =>
+      makeModelNode(kernelNode.id, nodeStateFor(kernelNode.id, selectedNodeId, activeNodes, pathNodes)),
     );
+    return [...LAYER_AREA_NODES, ...modelNodes];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const layerAreas: Node[] = layerOrder.map((layer) => {
-      const size = layerAreaSize(layer, layerTotals[layer]);
-      return {
-        id: `layer-area-${layer}`,
-        position: {
-          x: -layerPaddingX,
-          y: layerBaseY[layer] - layerPaddingTop,
-        },
-        data: {
-          label: (
-            <div className="layerAreaLabel">
-              <strong>{layerNames[layer]}</strong>
-              <span>{layerTotals[layer]} узлов</span>
-            </div>
-          ),
-        },
-        className: ["layerArea", `layerArea-${layer}`].join(" "),
-        selectable: false,
-        draggable: false,
-        connectable: false,
-        focusable: false,
-        zIndex: -100,
-        style: {
-          width: size.width,
-          height: size.height,
-          borderColor: layerColors[layer],
-        },
-      };
-    });
-
-    const layerCounters: Record<Layer, number> = {
-      hardware: 0,
-      kernel: 0,
-      userspace: 0,
-      observability: 0,
-    };
-
-    const modelNodes: Node[] = kernelNodes.map((kernelNode) => {
-      const indexInLayer = layerCounters[kernelNode.layer];
-      layerCounters[kernelNode.layer] += 1;
-
-      const isSelected = kernelNode.id === selectedNodeId;
-      const isPath = pathNodes.has(kernelNode.id);
-      const isActive = activeNodes.has(kernelNode.id);
-      const state: NodeState = isSelected ? "selected" : isPath ? "path" : isActive ? "active" : "idle";
-
-      return {
-        id: kernelNode.id,
-        type: "model",
-        position: makePosition(kernelNode.layer, indexInLayer),
-        // Явные размеры: react-flow знает геометрию узла и позиции handle сразу,
-        // без кадра с неизмеренными (NaN) координатами при перестройке во время
-        // проигрывания сценария.
-        width: nodeWidth,
-        height: nodeHeight,
-        data: {
-          title: kernelNode.title,
-          category: kernelNode.category,
-          layer: kernelNode.layer,
-          color: layerColors[kernelNode.layer],
-          state,
-        } satisfies ModelNodeData,
-        zIndex: state === "idle" ? 1 : 6,
-      };
-    });
-
-    return [...layerAreas, ...modelNodes];
-  }, [activeNodes, pathNodes, selectedNodeId]);
-
-  const edges: Edge[] = useMemo(
+  const initialEdges = useMemo(
     () =>
       kernelEdges
         .filter((kernelEdge) => nodeById.has(kernelEdge.source) && nodeById.has(kernelEdge.target))
-        .map((kernelEdge) => {
-          const isActive = activeEdges.has(kernelEdge.id);
-          const color = isActive ? "#facc15" : "rgba(100, 116, 139, 0.48)";
-          return {
-            id: kernelEdge.id,
-            source: kernelEdge.source,
-            target: kernelEdge.target,
-            type: "packet",
-            animated: isActive,
-            zIndex: isActive ? 4 : 0,
-            data: {
-              label: isActive ? edgeTypeLabels[kernelEdge.type] : undefined,
-              animated: isActive,
-              color: isActive ? "#facc15" : "#64748b",
-            } satisfies PacketEdgeData,
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: isActive ? "#facc15" : "#64748b",
-            },
-            style: {
-              opacity: isActive ? 1 : 0.34,
-              stroke: color,
-              strokeWidth: isActive ? 3 : 0.9,
-            },
-          };
-        }),
-    [activeEdges],
+        .map((kernelEdge) => makeEdge(kernelEdge.id, activeEdges.has(kernelEdge.id))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Синхронизируем состояние узлов (selected/active/path) без пересоздания всего
+  // массива — меняем только те узлы, у которых состояние реально изменилось.
+  useEffect(() => {
+    setNodes((prev) => {
+      let changed = false;
+      const next = prev.map((node) => {
+        if (node.id.startsWith("layer-area-")) return node;
+        const state = nodeStateFor(node.id, selectedNodeId, activeNodes, pathNodes);
+        if ((node.data as unknown as ModelNodeData).state === state) return node;
+        changed = true;
+        return {
+          ...node,
+          zIndex: state === "idle" ? 1 : 6,
+          data: { ...(node.data as unknown as ModelNodeData), state },
+        };
+      });
+      return changed ? next : prev;
+    });
+  }, [activeNodes, pathNodes, selectedNodeId, setNodes]);
+
+  // Аналогично для рёбер: обновляем только изменившие активность.
+  useEffect(() => {
+    setEdges((prev) => {
+      let changed = false;
+      const next = prev.map((edge) => {
+        const isActive = activeEdges.has(edge.id);
+        const wasActive = Boolean((edge.data as unknown as PacketEdgeData)?.animated);
+        if (isActive === wasActive) return edge;
+        changed = true;
+        return {
+          ...edge,
+          ...edgeVisual(isActive),
+          data: edgeData(edge.id, isActive),
+        };
+      });
+      return changed ? next : prev;
+    });
+  }, [activeEdges, setEdges]);
 
   const handleNodeClick: NodeMouseHandler = (_, node) => {
     if (node.id.startsWith("layer-area-")) {
@@ -305,23 +363,25 @@ export function LinuxMap({ selectedNodeId, activeNodeIds, activeEdgeIds, pathNod
         ))}
       </div>
       <ReactFlowProvider>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onNodeClick={handleNodeClick}
-        defaultViewport={{ x: 36, y: 72, zoom: 0.78 }}
-        minZoom={0.35}
-        maxZoom={1.6}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Background color="rgba(148, 163, 184, 0.16)" gap={28} />
-        <Controls showInteractive={false} />
-      </ReactFlow>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          onNodeClick={handleNodeClick}
+          defaultViewport={{ x: 36, y: 72, zoom: 0.78 }}
+          minZoom={0.35}
+          maxZoom={1.6}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={false}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background color="rgba(148, 163, 184, 0.16)" gap={28} />
+          <Controls showInteractive={false} />
+        </ReactFlow>
       </ReactFlowProvider>
     </section>
   );
