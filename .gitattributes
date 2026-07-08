@@ -1,0 +1,14 @@
+# Нормализация переносов строк, чтобы репозиторий одинаково работал на любой ОС.
+* text=auto eol=lf
+
+# Shell-скрипты обязаны иметь LF, иначе ломаются на Linux (bad interpreter / \r).
+*.sh text eol=lf
+
+# Windows-скрипты — CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Бинарные типы — без преобразований.
+*.png binary
+*.jpg binary
+*.ico binary
