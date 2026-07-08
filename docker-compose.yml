@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    image: linux-kernel-visual-model
+    container_name: linux-kernel-model
+    ports:
+      # Хост:контейнер — открывайте http://localhost:8080
+      - "8080:80"
+    restart: unless-stopped

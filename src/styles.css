@@ -1,0 +1,1582 @@
+:root {
+  color-scheme: dark;
+  --bg: #070b12;
+  --panel: #0d1420;
+  --panel-2: #111a28;
+  --panel-3: #152235;
+  --line: rgba(148, 163, 184, 0.18);
+  --line-strong: rgba(148, 163, 184, 0.34);
+  --text: #e5edf6;
+  --muted: #9aa9bc;
+  --soft: #cbd5e1;
+  --cyan: #22d3ee;
+  --amber: #f59e0b;
+  --green: #34d399;
+  --violet: #c084fc;
+  --red: #fb7185;
+  --yellow: #facc15;
+  --blue: #60a5fa;
+  --radius: 8px;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+code {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 6px;
+  padding: 0.2rem 0.42rem;
+  background: rgba(2, 6, 23, 0.56);
+  color: #d6f3ff;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.appShell {
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  border-right: 1px solid var(--line);
+  background: #090f18;
+  padding: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  background: var(--panel);
+}
+
+.brand svg {
+  color: var(--cyan);
+}
+
+.brand strong,
+.brand span {
+  display: block;
+}
+
+.brand strong {
+  font-size: 1rem;
+}
+
+.brand span {
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.navList {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.4rem 0;
+}
+
+.navButton,
+.iconButton,
+.iconTextButton,
+.tokenButton,
+.relatedGrid button,
+.edgeList button,
+.nodeChipRow button,
+.examplePaths button,
+.searchResult {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.72);
+  color: var(--soft);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 42px;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+}
+
+.navButton svg {
+  flex: 0 0 auto;
+}
+
+.navButton:hover,
+.iconButton:hover,
+.iconTextButton:hover,
+.tokenButton:hover,
+.relatedGrid button:hover,
+.edgeList button:hover,
+.nodeChipRow button:hover,
+.examplePaths button:hover,
+.searchResult:hover {
+  border-color: var(--line-strong);
+  background: rgba(30, 41, 59, 0.82);
+  color: #fff;
+}
+
+.navButton.active {
+  border-color: rgba(34, 211, 238, 0.52);
+  background: rgba(14, 116, 144, 0.18);
+  color: #e0fbff;
+}
+
+.statBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.75rem;
+  background: rgba(13, 20, 32, 0.72);
+}
+
+.statBlock span {
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.statBlock strong {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.workspace {
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  z-index: 15;
+  top: 0;
+  display: grid;
+  grid-template-columns: auto minmax(240px, 1fr) minmax(200px, 300px) auto;
+  gap: 0.75rem;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 11, 18, 0.94);
+  padding: 0.8rem 1rem;
+  backdrop-filter: blur(14px);
+}
+
+.topbarBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 0.4rem;
+  white-space: nowrap;
+}
+
+.topbarBrand svg {
+  color: var(--cyan);
+}
+
+.topbarBrand strong {
+  font-size: 0.98rem;
+}
+
+.searchBox,
+.panelSearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 0 0.7rem;
+}
+
+.searchBox svg,
+.panelSearch svg {
+  color: var(--muted);
+}
+
+.searchBox input,
+.panelSearch input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.searchBox input::placeholder,
+.panelSearch input::placeholder {
+  color: #718096;
+}
+
+.searchResults {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 0.35rem;
+  max-height: min(520px, 70vh);
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: #09101a;
+  padding: 0.5rem;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.36);
+}
+
+.searchResult {
+  display: grid;
+  gap: 0.18rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+}
+
+.searchResult span {
+  color: var(--cyan);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.searchResult strong,
+.searchResult small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchResult small {
+  color: var(--muted);
+}
+
+.scenarioSelect,
+.pathSelectors select {
+  min-width: 0;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  padding: 0 0.65rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.iconButton,
+.iconTextButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0 0.72rem;
+  white-space: nowrap;
+}
+
+.iconButton {
+  width: 40px;
+  padding: 0;
+}
+
+.iconTextButton.primary {
+  border-color: rgba(52, 211, 153, 0.5);
+  background: rgba(16, 185, 129, 0.16);
+  color: #d1fae5;
+}
+
+.noticeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 40px;
+  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 1rem;
+  color: var(--muted);
+  background: rgba(13, 20, 32, 0.7);
+  font-size: 0.88rem;
+}
+
+.noticeBar strong {
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 1rem;
+  min-height: 0;
+  padding: 1rem;
+}
+
+.centerColumn {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+}
+
+.graphShell {
+  position: relative;
+  height: clamp(600px, 74vh, 940px);
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #080f19;
+}
+
+.layerLegend {
+  position: absolute;
+  z-index: 6;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  max-width: calc(100% - 1.5rem);
+}
+
+.layerLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.28rem 0.55rem;
+  background: rgba(2, 6, 23, 0.72);
+  color: var(--soft);
+  font-size: 0.74rem;
+}
+
+.layerLegend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.flowNode.react-flow__node-default {
+  width: 220px;
+  height: 78px;
+  border-width: 1px;
+  border-radius: 8px;
+  background: rgba(13, 20, 32, 0.94);
+  color: var(--text);
+  padding: 0;
+  text-align: left;
+}
+
+.layerArea.react-flow__node-default {
+  pointer-events: none;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 8px;
+  padding: 0;
+  text-align: left;
+  opacity: 0.82;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
+
+.layerArea-hardware.react-flow__node-default {
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.105), rgba(34, 211, 238, 0.025));
+  border-color: rgba(34, 211, 238, 0.28) !important;
+}
+
+.layerArea-kernel.react-flow__node-default {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.026));
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.layerArea-userspace.react-flow__node-default {
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.105), rgba(52, 211, 153, 0.024));
+  border-color: rgba(52, 211, 153, 0.28) !important;
+}
+
+.layerArea-observability.react-flow__node-default {
+  background: linear-gradient(90deg, rgba(192, 132, 252, 0.11), rgba(192, 132, 252, 0.024));
+  border-color: rgba(192, 132, 252, 0.29) !important;
+}
+
+.layerAreaLabel {
+  position: absolute;
+  top: 0.85rem;
+  left: 5.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: calc(100% - 1.8rem);
+  margin: 0;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.72);
+  padding: 0.28rem 0.62rem;
+  color: var(--soft);
+  white-space: nowrap;
+}
+
+.layerAreaLabel strong {
+  font-size: 0.76rem;
+  line-height: 1;
+}
+
+.layerAreaLabel span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.flowNodeLabel {
+  display: grid;
+  gap: 0.2rem;
+  height: 100%;
+  align-content: center;
+  overflow: hidden;
+  padding: 0.68rem 0.76rem;
+}
+
+.flowNodeLabel strong {
+  display: -webkit-box;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.88rem;
+  line-height: 1.18;
+}
+
+.flowNodeLabel span {
+  display: -webkit-box;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.22;
+}
+
+.flowNode-hardware.react-flow__node-default {
+  border-top: 3px solid var(--cyan);
+}
+
+.flowNode-kernel.react-flow__node-default {
+  border-top: 3px solid var(--amber);
+}
+
+.flowNode-userspace.react-flow__node-default {
+  border-top: 3px solid var(--green);
+}
+
+.flowNode-observability.react-flow__node-default {
+  border-top: 3px solid var(--violet);
+}
+
+.flowNodeActive.react-flow__node-default {
+  background: rgba(30, 41, 59, 0.98);
+}
+
+.react-flow__edge-textbg {
+  rx: 4;
+}
+
+.react-flow__controls,
+.react-flow__minimap {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: rgba(9, 16, 26, 0.88);
+}
+
+.react-flow__controls-button {
+  border-bottom: 1px solid var(--line);
+  background: rgba(15, 23, 42, 0.88);
+  color: var(--text);
+  fill: var(--text);
+}
+
+.mapPanels {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.88fr) minmax(420px, 1.4fr) minmax(260px, 1fr);
+  gap: 1rem;
+}
+
+.scenarioPanel,
+.metricsPanel,
+.learningPanel,
+.timeline,
+.inspector,
+.contentPanel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.scenarioPanel,
+.learningPanel,
+.metricsPanel {
+  min-width: 0;
+  padding: 0.9rem;
+}
+
+.panelTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.panelTitleRow h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.96rem;
+}
+
+.panelTitleRow span,
+.snapshotLabel {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.scenarioPanel h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.02rem;
+}
+
+.scenarioPanel p,
+.learningPanel p,
+.contentPanel p,
+.inspector p {
+  color: var(--muted);
+  line-height: 1.48;
+}
+
+.currentStepBox {
+  display: grid;
+  gap: 0.48rem;
+  border: 1px solid rgba(250, 204, 21, 0.24);
+  border-radius: var(--radius);
+  background: rgba(113, 63, 18, 0.16);
+  padding: 0.75rem;
+}
+
+.currentStepBox time {
+  color: var(--yellow);
+  font-size: 0.78rem;
+}
+
+.currentStepBox strong {
+  font-size: 0.92rem;
+}
+
+.currentStepBox span {
+  color: var(--soft);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.metricTile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.2rem 0.48rem;
+  align-items: center;
+  min-height: 68px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.58);
+  padding: 0.62rem;
+}
+
+.metricTile svg {
+  color: var(--blue);
+}
+
+.metricTile span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.metricTile strong {
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+
+.metricTile.ok {
+  border-color: rgba(52, 211, 153, 0.26);
+}
+
+.metricTile.warn {
+  border-color: rgba(245, 158, 11, 0.46);
+  background: rgba(113, 63, 18, 0.16);
+}
+
+.metricTile.danger {
+  border-color: rgba(251, 113, 133, 0.58);
+  background: rgba(127, 29, 29, 0.2);
+}
+
+.pathSelectors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 0.45rem;
+}
+
+.examplePaths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.examplePaths button {
+  padding: 0.35rem 0.5rem;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.pathExplanation {
+  display: grid;
+  gap: 0.45rem;
+  max-height: 220px;
+  overflow: auto;
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--soft);
+  font-size: 0.84rem;
+  line-height: 1.42;
+}
+
+.timeline {
+  min-width: 0;
+  padding: 0.8rem;
+}
+
+.timelineScroller {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 300px);
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.timelineItem {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 150px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.58);
+  color: var(--soft);
+  padding: 0.7rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.timelineItem time {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.timelineItem strong {
+  font-size: 0.9rem;
+}
+
+.timelineItem span,
+.timelineItem small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.timelineItem small {
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+
+.timelineItem.past {
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+.timelineItem.current {
+  border-color: rgba(250, 204, 21, 0.58);
+  background: rgba(113, 63, 18, 0.18);
+}
+
+.inspector {
+  position: sticky;
+  top: 88px;
+  height: calc(100vh - 104px);
+  overflow: auto;
+  padding: 1rem;
+}
+
+.inspectorHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.layerPill,
+.modelBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+}
+
+.modelBadge {
+  color: var(--muted);
+}
+
+.inspector h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+}
+
+.inspectorSection {
+  border-top: 1px solid var(--line);
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+}
+
+.inspectorSection h3,
+.parameterGroup h2,
+.diagnosticCard h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin: 0 0 0.58rem;
+  color: var(--soft);
+  font-size: 0.88rem;
+}
+
+.warningSection {
+  border-color: rgba(251, 113, 133, 0.34);
+}
+
+.tokenList,
+.tagRow,
+.nodeChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+}
+
+.tokenButton,
+.nodeChipRow button,
+.nodeChipRow span,
+.tagRow span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  background: rgba(15, 23, 42, 0.7);
+  color: var(--soft);
+  font-size: 0.75rem;
+}
+
+.compactList,
+.edgeList {
+  display: grid;
+  gap: 0.38rem;
+  margin: 0;
+  padding-left: 1.05rem;
+  color: var(--muted);
+}
+
+.commandList,
+.commandStack {
+  display: grid;
+  gap: 0.36rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.38rem;
+}
+
+.relatedGrid button {
+  min-height: 32px;
+  overflow-wrap: anywhere;
+  padding: 0.35rem 0.48rem;
+  text-align: left;
+  font-size: 0.77rem;
+}
+
+.edgeList {
+  padding-left: 0;
+  list-style: none;
+}
+
+.edgeList li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.edgeList button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 0.25rem 0.42rem;
+  font-size: 0.76rem;
+}
+
+.contentPanel {
+  min-width: 0;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.panelHero {
+  display: grid;
+  gap: 0.8rem;
+  min-height: 180px;
+  align-items: end;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, rgba(13, 20, 32, 0.94), rgba(21, 34, 53, 0.74)),
+    url("data:image/svg+xml,%3Csvg width='1200' height='320' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1200' height='320' fill='%230b1220'/%3E%3Cg stroke='%2322d3ee' stroke-opacity='0.16' fill='none'%3E%3Cpath d='M40 260 H200 V90 H360 V210 H560 V70 H780 V250 H1020 V120 H1160'/%3E%3Cpath d='M80 190 H260 V130 H440 V240 H700 V100 H960 V205 H1140'/%3E%3C/g%3E%3Cg fill='%23f59e0b' fill-opacity='0.35'%3E%3Ccircle cx='200' cy='90' r='4'/%3E%3Ccircle cx='560' cy='70' r='4'/%3E%3Ccircle cx='780' cy='250' r='4'/%3E%3Ccircle cx='1020' cy='120' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  padding: 1rem;
+}
+
+.compactHero {
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
+  min-height: 132px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: var(--cyan);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.panelHero h1 {
+  margin: 0.25rem 0 0.4rem;
+  font-size: 1.55rem;
+}
+
+.panelHero p {
+  max-width: 760px;
+  margin: 0;
+}
+
+.sysctlWarning {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(245, 158, 11, 0.34);
+  border-radius: var(--radius);
+  background: rgba(113, 63, 18, 0.18);
+  color: #fde68a;
+  margin: 1rem 0;
+  padding: 0.75rem;
+}
+
+.parameterGroups,
+.parameterList,
+.diagnosticGrid,
+.clarificationList {
+  display: grid;
+  gap: 1rem;
+}
+
+.parameterGroup {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.parameterGroup h2 {
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.parameterGroup h2 span {
+  color: var(--muted);
+}
+
+.parameterList {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.parameterCard,
+.diagnosticCard,
+.clarificationItem {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.58);
+  padding: 0.9rem;
+}
+
+.parameterCard.highlighted,
+.diagnosticCard.highlighted {
+  border-color: rgba(250, 204, 21, 0.62);
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.22);
+}
+
+.parameterHeader {
+  display: grid;
+  gap: 0.42rem;
+  margin-bottom: 0.55rem;
+}
+
+.parameterHeader strong {
+  font-size: 1rem;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.7rem 0;
+}
+
+.detailGrid div {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+}
+
+.detailGrid dt {
+  margin-bottom: 0.24rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.detailGrid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--soft);
+  font-size: 0.82rem;
+}
+
+.commandColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.commandColumns div {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+}
+
+.commandColumns h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.riskText {
+  border-left: 3px solid var(--amber);
+  margin: 0.8rem 0 0;
+  padding-left: 0.65rem;
+}
+
+.diagnosticGrid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-top: 1rem;
+}
+
+.diagnosticCard {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.diagnosticTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diagnosticTitle svg {
+  color: var(--green);
+}
+
+.diagnosticTitle h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.diagnosticCard section {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.diagnosticCard ul {
+  margin: 0;
+  padding-left: 1.05rem;
+  color: var(--muted);
+}
+
+.clarificationsPanel .panelHero {
+  min-height: 240px;
+}
+
+.clarificationList {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin-top: 1rem;
+}
+
+.clarificationItem {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.clarificationItem svg {
+  flex: 0 0 auto;
+  color: var(--cyan);
+}
+
+.clarificationItem p {
+  margin: 0;
+}
+
+.mutedLine {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+/* ── Кастомные узлы карты: возвышение активных/выбранных ───────────────── */
+.react-flow__node-model {
+  width: 220px;
+  background: transparent;
+  border: 0;
+}
+
+.modelNode {
+  position: relative;
+  width: 220px;
+  height: 82px;
+  display: grid;
+  align-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-top: 3px solid var(--node-color, #64748b);
+  border-radius: 8px;
+  background: rgba(13, 20, 32, 0.94);
+  color: var(--text);
+  padding: 0.62rem 0.76rem;
+  text-align: left;
+  cursor: pointer;
+  transform-origin: center bottom;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.modelNodeBody {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.modelNodeBody strong {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.88rem;
+  line-height: 1.18;
+}
+
+.modelNodeBody span {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.22;
+}
+
+.modelHandle {
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modelNode-active {
+  border-color: var(--node-color);
+  background: rgba(30, 41, 59, 0.98);
+  box-shadow:
+    0 0 0 1px var(--node-color),
+    0 10px 26px rgba(34, 211, 238, 0.16);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.modelNode-path {
+  border-color: var(--node-color);
+  background: rgba(30, 41, 59, 0.99);
+  box-shadow:
+    0 0 0 2px var(--node-color),
+    0 16px 34px rgba(250, 204, 21, 0.24);
+  transform: translateY(-4px) scale(1.06);
+}
+
+.modelNode-selected {
+  border-color: var(--yellow);
+  background: rgba(30, 41, 59, 1);
+  box-shadow:
+    0 0 0 2px var(--yellow),
+    0 20px 42px rgba(250, 204, 21, 0.32);
+  transform: translateY(-6px) scale(1.09);
+}
+
+/* ── Пакеты и подписи связей (стиль Packet Tracer) ─────────────────────── */
+.edgePacket {
+  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.75));
+}
+
+.edgeFloatLabel {
+  position: absolute;
+  white-space: nowrap;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 0.1rem 0.4rem;
+  color: #fde68a;
+  font-size: 10px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+/* ── Сворачивание панелей ──────────────────────────────────────────────── */
+.mainGrid.inspectorHidden {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.inspectorReopen {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 64px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  color: var(--soft);
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+}
+
+.inspectorReopen:hover {
+  border-color: var(--cyan);
+  color: #fff;
+}
+
+.collapseToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.collapseToggle h2 {
+  margin: 0;
+  font-size: 0.96rem;
+}
+
+.collapseIconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.72);
+  color: var(--soft);
+  cursor: pointer;
+}
+
+.collapseIconButton:hover {
+  border-color: var(--line-strong);
+  color: #fff;
+}
+
+.timeline.collapsed .panelTitleRow {
+  margin-bottom: 0;
+}
+
+/* ── Inspector: роль и связи предложениями ─────────────────────────────── */
+.roleMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.roleMeta strong {
+  color: var(--soft);
+}
+
+.roleSection p {
+  margin-top: 0;
+  color: var(--soft);
+}
+
+.relationList {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.relationButton {
+  display: grid;
+  gap: 0.28rem;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.6);
+  color: var(--soft);
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.relationButton:hover {
+  border-color: var(--line-strong);
+  background: rgba(30, 41, 59, 0.82);
+}
+
+.relationPhrase {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.relationPhrase em {
+  font-style: normal;
+  color: var(--cyan);
+  font-size: 0.71rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.relationDesc {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+/* ── Модалка «Справка» (параметры / диагностика / о модели) ────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5vh 2vw;
+  background: rgba(2, 6, 12, 0.66);
+  backdrop-filter: blur(4px);
+}
+
+.modalCard {
+  display: flex;
+  flex-direction: column;
+  width: min(1100px, 96vw);
+  height: min(88vh, 900px);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  padding: 0.7rem 0.9rem;
+  background: rgba(9, 15, 24, 0.7);
+}
+
+.modalTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.modalTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: var(--soft);
+  padding: 0.3rem 0.8rem;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.modalTab:hover {
+  border-color: var(--line-strong);
+  color: #fff;
+}
+
+.modalTab.active {
+  border-color: rgba(34, 211, 238, 0.52);
+  background: rgba(14, 116, 144, 0.2);
+  color: #e0fbff;
+}
+
+.modalBody {
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem;
+}
+
+/* Внутри модалки панели-справочники не нуждаются в собственной рамке. */
+.modalBody .contentPanel {
+  border: 0;
+  padding: 0;
+}
+
+/* ── Экран ошибки (ErrorBoundary) ──────────────────────────────────────── */
+.errorBoundary {
+  display: grid;
+  gap: 0.8rem;
+  justify-items: start;
+  max-width: 640px;
+  margin: 12vh auto;
+  border: 1px solid rgba(251, 113, 133, 0.4);
+  border-radius: var(--radius);
+  background: rgba(127, 29, 29, 0.16);
+  padding: 1.4rem;
+}
+
+.errorBoundary h2 {
+  margin: 0;
+}
+
+.errorBoundary p {
+  margin: 0;
+  color: var(--soft);
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1380px) {
+  .mainGrid {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  .mapPanels {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .learningPanel {
+    grid-column: 1 / -1;
+  }
+
+  .metricGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1120px) {
+  .appShell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .brand,
+  .navList {
+    grid-column: 1 / -1;
+  }
+
+  .navList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .topbar {
+    grid-template-columns: 1fr;
+    position: static;
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .inspector {
+    position: static;
+    height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .sidebar,
+  .mainGrid {
+    padding: 0.75rem;
+  }
+
+  .navList,
+  .mapPanels,
+  .parameterList,
+  .diagnosticGrid,
+  .clarificationList,
+  .detailGrid,
+  .commandColumns,
+  .compactHero {
+    grid-template-columns: 1fr;
+  }
+
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pathSelectors {
+    grid-template-columns: 1fr;
+  }
+
+  .graphShell {
+    height: 520px;
+  }
+
+  .noticeBar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,25 @@
+import type { MetricSnapshot } from "../types";
+
+export const initialMetrics: MetricSnapshot = {
+  cpuUsage: 18,
+  loadAverage: 0.74,
+  runnableTasks: 2,
+  contextSwitches: 1250,
+  ramTotalMb: 16000,
+  ramUsedMb: 6200,
+  memAvailableMb: 8200,
+  pageCacheMb: 3200,
+  dirtyPagesMb: 90,
+  swapUsedMb: 64,
+  majorPageFaults: 8,
+  minorPageFaults: 15200,
+  diskReadMb: 18,
+  diskWriteMb: 24,
+  ioWait: 1.5,
+  networkRxMb: 42,
+  networkTxMb: 36,
+  processCount: 238,
+  threadCount: 982,
+  oomEvents: 0,
+  serviceState: "active",
+};
